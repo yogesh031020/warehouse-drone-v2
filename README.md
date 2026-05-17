@@ -25,6 +25,11 @@ After v1 (basic waypoint following) struggled with drift in GPS-denied spaces, I
 | IR Beacons (×4) | Precision docking markers |
 | Servo Gripper | Package pickup/release |
 
+## Hardware Showcase
+
+![Warehouse Drone Front](drone_front.jpg)
+![Warehouse Drone ESP32 Control Board](drone_esp32.jpg)
+
 ## System architecture
 
 ```
