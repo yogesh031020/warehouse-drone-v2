@@ -101,7 +101,52 @@ graph TD
 
 ---
 
+---
+
+## 🛠️ Step-by-Step "How to Run" & Deployment Guide
+
+To deploy the dual-core FreeRTOS autonomous companion computer on your physical warehouse UAV, follow these steps:
+
+### 1. Configure the Arduino Development IDE
+1. Open the [Arduino IDE](https://www.arduino.cc/en/software).
+2. Install the **ESP32 Core** (Espressif v2.0.0+) by adding `https://dl.espressif.com/dl/package_esp32_index.json` to your Preferences.
+3. Install the required **TensorFlow Lite Micro** library:
+   * Go to **Sketch ➔ Include Library ➔ Manage Libraries...**
+   * Search for `TensorFlowLite_ESP32` or download the Flatbuffer-compatible ESP32 compilation zip, and import it.
+
+### 2. Configure Coordinates & Flatbuffer Weights
+1. Open `warehouse_drone.ino` in your IDE. This automatically imports all tabs.
+2. Edit `config.h` to set your target destination coordinate grid coordinates:
+   ```cpp
+   #define TARGET_GRID_X  4   // Destination grid x
+   #define TARGET_GRID_Y  6   // Destination grid y
+   #define TARGET_GRID_Z  2   // Safe flight altitude (m)
+   ```
+3. *(Optional)* If you retrained the obstacle classifier network, open `model_data.h` and update the `g_model` array with your compiled flatbuffer binary weights.
+
+### 3. Flash the Companion Core
+1. Connect the ESP32 to your PC using a micro-USB data cable.
+2. Under **Tools**, select Board: **ESP32 Dev Module** and the correct COM Port.
+3. Verify that your partition scheme supports at least **1.2MB APP + OTA** (Huge APP scheme) to accommodate the TensorFlow Lite model.
+4. Click **Upload** to compile and transfer the firmware to the ESP32 flash chip.
+
+### 4. Physical Setup & Calibration
+1. Mount the 4x **TSOP38238 IR sensors** on the outer corners of your drone frame (pointing outwards and slightly down).
+2. Place your **38kHz active IR beacons** in the four corners of your designated flight testing room.
+3. Ensure the **MG90S package gripper servo** is powered by a dedicated **5V BEC** power rail to prevent transient inductive voltage spikes from crashing the ESP32.
+4. Verify the dual-beam HC-SR04 sonar sensors are calibrated and pointed forward.
+
+### 5. Launch Autonomous Mission
+1. Power on the beacons and then power the UAV avionics stack.
+2. Enable manual flight overrides on your RC transmitter as a physical safety interlock.
+3. Arm the APM flight controller in **ALT_HOLD** mode.
+4. Once altitude hold is stable, engage the companion override switch.
+5. The ESP32 Core 0 A* solver will calculate the grid waypoints, initiate the dynamic IR triangulation tracking loop, navigate the grid avoiding obstacles with Core 1 sonars, trigger the MG90S servo to release the payload at the destination grid, and autonomously trigger the land sequence!
+
+---
+
 ## 📂 Repository Directory Layout
+
 ```directory
 warehouse-drone-v2/
 ├── config.h               # Grid layout, coordinate matrices, and pin configurations
