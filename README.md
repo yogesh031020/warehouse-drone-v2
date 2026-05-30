@@ -161,6 +161,12 @@ graph TD
 
 Before uploading custom flight firmware to a physical drone, the entire mission architecture can be validated in a **Software-in-the-Loop (SITL)** digital twin environment using ArduPilot and Mission Planner. The included Python script `sitl_warehouse_mission.py` models the exact autonomous state machine, MAVLink override sequence, and grid pathfinding telemetry.
 
+### 🎥 Live Simulation Demonstration
+Below is the full autonomous flight recording displaying:
+Takeoff ➔ Path Planning ➔ Package Pickup ➔ Delivery Dropoff ➔ Return to Home ➔ Landing.
+
+https://github.com/yogesh031020/warehouse-drone-v2/raw/main/docs/warehouse_v2_simulation.mp4
+
 ### Running the Virtual Mission:
 
 1. **Install Dependencies:**
@@ -212,6 +218,7 @@ warehouse-drone-v2/
 ├── docs/
 │   ├── Hardware_Wiring_Map.md          # Detailed system wiring and logic schematic
 │   ├── warehouse_v2_execution.log      # Real-time mission execution and ML debug log
+│   ├── warehouse_v2_simulation.mp4     # Screen recording of full SITL autonomous flight mission
 │   └── images/
 │       ├── drone_front.jpg             # Front flight assembly visual showcase
 │       └── drone_esp32.jpg             # Close-up companion board hardware layout
