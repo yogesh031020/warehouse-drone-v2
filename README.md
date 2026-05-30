@@ -157,31 +157,65 @@ graph TD
 
 ---
 
+## 💻 MAVLink Digital Twin Simulation (SITL)
+
+Before uploading custom flight firmware to a physical drone, the entire mission architecture can be validated in a **Software-in-the-Loop (SITL)** digital twin environment using ArduPilot and Mission Planner. The included Python script `sitl_warehouse_mission.py` models the exact autonomous state machine, MAVLink override sequence, and grid pathfinding telemetry.
+
+### Running the Virtual Mission:
+
+1. **Install Dependencies:**
+   Install required Python packages for MAVLink protocol parsing:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Launch the SITL Autopilot inside Mission Planner:**
+   * Open **Mission Planner** on your PC.
+   * Go to the **Simulation** tab in the top menu bar.
+   * Select the **Multicopter** frame icon. Mission Planner will download and launch a local virtual ArduCopter instance.
+   * Wait until the autopilot finishes calibrating its virtual navigation filters (the HUD displays `AHRS OK` and the position stabilizes).
+
+3. **Execute the Autonomy Script:**
+   Start the state-machine controller:
+   ```bash
+   python sitl_warehouse_mission.py
+   ```
+
+### Simulation Execution Sequence:
+* **Pre-Flight Diagnostics:** Runs virtual check loops for LiDAR, ultrasonic altimeters, and package grippers.
+* **Auto-Mission Upload:** Generates a 3D coordinate path to the PICKUP station, then to the DELIVERY station, and finally back HOME. Automatically uploads the waypoints directly into ArduPilot's flight sequencer over a local TCP loop (`127.0.0.1:5762`).
+* **Armed Flight Launch:** Switches the virtual autopilot to `GUIDED`, arms the virtual motors, commands a takeoff rise to 10.0m cruise altitude, then switches to `AUTO` mode to hand control over to the uploaded mission array.
+* **Autonomous Mission Cycle:** Navigates the coordinates, reports real-time metric distances, simulates package grasping at 1.5m, performs dropping off at the target coordinates, flies home, commands `LAND`, and disarms upon landing confirmation!
+
+---
+
 ## 📂 Repository Directory Layout
 
 ```
 warehouse-drone-v2/
-├── config.h               # Grid layout, coordinate matrices, and pin configurations
-├── gripper.h              # Servo release driver library
-├── ir_beacon.h            # IR interrupt parsing and triangulation equations
-├── lidar.h                # Downward LiDAR TF-Mini distance estimator
-├── mavlink_comm.h         # Advanced MAVLink telemetry protocol interface
-├── ml_inference.h         # TensorFlow Lite Micro classifier interface
-├── model_data.h           # Compiled flatbuffer neural network weights
-├── obstacle_avoid.h       # Ultrasonic array driver and alert threshold loop
-├── path_planner.h         # Optimized C++ A* 3D pathfinding engine
-├── state_machine.h        # Mission state loops (Takeoff, Path, Dock, Release, Land)
-├── ultrasonic.h           # High-precision HC-SR04 sonar pulse handler
-├── warehouse_map.h        # 3D grid voxel matrix representation
-├── wifi_debug.h           # UDP-based LAN telemetry logging engine
-├── warehouse_drone.ino    # Core Arduino entry sketch orchestrating FreeRTOS tasks
+├── config.h                   # Grid layout, coordinate matrices, and pin configurations
+├── gripper.h                  # Servo release driver library
+├── ir_beacon.h                # IR interrupt parsing and triangulation equations
+├── lidar.h                    # Downward LiDAR TF-Mini distance estimator
+├── mavlink_comm.h             # Advanced MAVLink telemetry protocol interface
+├── ml_inference.h             # TensorFlow Lite Micro classifier interface
+├── model_data.h               # Compiled flatbuffer neural network weights
+├── obstacle_avoid.h           # Ultrasonic array driver and alert threshold loop
+├── path_planner.h             # Optimized C++ A* 3D pathfinding engine
+├── state_machine.h            # Mission state loops (Takeoff, Path, Dock, Release, Land)
+├── ultrasonic.h               # High-precision HC-SR04 sonar pulse handler
+├── warehouse_map.h            # 3D grid voxel matrix representation
+├── wifi_debug.h               # UDP-based LAN telemetry logging engine
+├── warehouse_drone.ino        # Core Arduino entry sketch orchestrating FreeRTOS tasks
+├── sitl_warehouse_mission.py  # MAVLink SITL digital twin simulation controller
+├── requirements.txt           # Python dependency specifications for SITL simulation
 ├── docs/
 │   ├── Hardware_Wiring_Map.md          # Detailed system wiring and logic schematic
 │   ├── warehouse_v2_execution.log      # Real-time mission execution and ML debug log
 │   └── images/
 │       ├── drone_front.jpg             # Front flight assembly visual showcase
 │       └── drone_esp32.jpg             # Close-up companion board hardware layout
-└── LICENSE                # MIT License
+└── LICENSE                    # MIT License
 ```
 
 ---
